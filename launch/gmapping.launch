@@ -1,16 +1,27 @@
-<!-- ISTO NÃO FUNCIONA FOI SÓ UM TESTE QUE TALVEZ AINDA POSSA SER CORRIGIDO -->
 <launch>
-    <node pkg="tf" type="static_transform_publisher" name="tfMessage" args="1 0 0 0 0 0 1 link1_parent link1 100" />
-    <!-- Launch your nodes here -->
-    <node name="gmapping_node" pkg="gmapping" type="slam_gmapping" output="screen">
-        <!-- Add parameters for gmapping node if needed -->
-        <remap from="tf" to="base_scan"/>
-        <!-- Add this so that it doesn't duplicate the values in the tf topic -->
-        <param name="transform_publish_period" value="0"/>
-        <!-- But it doesn't work ??? Maybe it is deleting something important -->
 
+    <!-- Set use_sim_time parameter -->
+    <param name="use_sim_time" value="true"/>
+
+    <!-- Static transform publisher (adicionar a distancia entre o laser e o centro do robo) -->
+    <node pkg="tf" type="static_transform_publisher" name="static_transform_publisher" args="0 0 0 0 0 0 1 /base_link laser 100"/>
+
+    <!-- RViz -->
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find ist-meic-saut-g31)/launch/gmapping.rviz"/>
+
+    <!-- Play rosbag -->
+    <node pkg="rosbag" type="play" name="rosbag_player" args="$(find ist-meic-saut-g31)/data/2024-04-30-20-46-52.bag --clock"/>
+
+    <!-- Gmapping -->
+    <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping">
+        <param name="map_update_interval" value="0.2"/>
+        <param name="xmin" value="-5.0"/>
+        <param name="ymin" value="-7.0"/>
+        <param name="xmax" value="7.0"/>
+        <param name="ymax" value="5.0"/>
     </node>
 
-    <!-- Set logging level for gmapping message filter -->
-    <!-- <node name="logger_level" pkg="rosconsole" type="set_logger_level" args="ros.gmapping.message_filter DEBUG"/> -->
+    <!-- Map server -->
+    <node pkg="map_server" type="map_saver" name="map_saver"/>
+
 </launch>
