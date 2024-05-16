@@ -7,6 +7,7 @@
 
 
 `source /opt/ros/noetic/setup.bash`
+`source ~/catkin_ws/devel/setup.bash`
 
 Aceder a terminais no pioneer:
 `ssh pi@192.168.28.20`
