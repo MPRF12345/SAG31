@@ -1,36 +1,33 @@
 from random import choices
 import numpy as np
+from scipy.special import softmax
 
-index = [0, 1, 2, 3, 4, 5]
-x = [4, 2, 1, 2, 3, 7]
-y = [12, 14, 17, 11, 12, 13]
-theta = [0.45, 0.49, 0.57, 0.43, 0.44, 0.47]
-weight = [3, 9, 0.5, 2, 7, 8]      
+#ps_pos = np.array([
+#    [4, 2, 1, 2, 3, 7],
+#    [12, 14, 17, 11, 12, 13]
+#])
+#ps_orientation = [0.45, 0.49, 0.57, 0.43, 0.44, 0.47]
+#weight = [3, 9, 0.5, 2, 7, 8]      
 
-particles = np.array([
-    index,
-    x,
-    y,
-    theta,
-    weight,
-])
 
-def importance_resampling(particles):
-   
-    Num_particles = len(particles[0,:])
-    sum_weights = sum(particles[4,:])
-    normalized_weights = [w / sum_weights for w in particles[4,:]]
+def resampling(ps_pos, ps_orientation, ps_weights):
 
-    indices_resamp = choices(particles[0,:], particles[4,:], k = Num_particles)
-    particles_resamp = np.transpose(np.array([particles[:,int(n)]for n in indices_resamp]))
+    index = [i for i in range(len(ps_orientation))]
+    Num_particles = len(index)
+    sum_weights = sum(ps_weights)
 
-    particles_resamp[4,:] = 1/Num_particles
+    indices_resamp = choices(index, ps_weights, k = Num_particles)
+    ps_pos = np.transpose(np.array([ps_pos[:,int(n)]for n in indices_resamp]))
+    ps_orientation = [ps_orientation[int(n)]for n in indices_resamp]
+    ps_weights = [1/Num_particles]*Num_particles
 
-    return particles_resamp
+    return ps_pos, ps_orientation, ps_weights
 
-resampled_particles = importance_resampling(particles)
-print(resampled_particles)
+#ps_pos, ps_orientation, ps_weights = resampling(ps_pos, ps_orientation, weight)
 
+#print(ps_pos)
+#print(ps_orientation)
+#print(weight)
 
 
 
