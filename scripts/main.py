@@ -4,6 +4,7 @@ from PIL import Image
 from .subscribers import SubscriberNode
 from .laser_simulator import LaserSimulator
 import rospy
+from scipy.special import softmax
 
 def getMap():
     # get the .pgm and .yaml files on the maps/ folder
@@ -42,6 +43,8 @@ if __name__ == '__main__':
 
         # update weights
         ps_weights = updateWeights(ps_pos, ps_orientation, scan_data, pixel_matrix, map_metadata)
+        #errors_neg = -np.array(abs(errors))
+        #weights = softmax(errors_neg)
 
         # resampling
         ps_pos, ps_orientation, ps_weights = resampling(ps_pos, ps_orientation, ps_weights)
