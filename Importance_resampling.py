@@ -1,6 +1,5 @@
 from random import choices
 import numpy as np
-from scipy.special import softmax
 
 #ps_pos = np.array([
 #    [4, 2, 1, 2, 3, 7],
