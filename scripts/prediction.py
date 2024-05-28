@@ -1,55 +1,46 @@
 import numpy as np
 
-def sample_motion_model(n, alpha, yaw, d, x_variables, y_variables):
-    def sum_matrices(n, alpha, yaw):
-        # Create a vertical matrix of n variables alpha
-        matrix_alpha = np.array([alpha] * n).reshape(n, 1)
+def sample_motion_model(n, alpha, yaw, d, new_alpha, x_variables, y_variables):
+    """
+    Update the particles' positions and angles based on odometry data.
 
-        # Create a vertical matrix of n constants yaw
-        matrix_yaw = np.array([yaw] * n).reshape(n, 1)
+    :param n: Number of particles.
+    :param alpha: Current yaw angles of the particles.
+    :param yaw: Yaw angles from odometry.
+    :param d: Distance moved by the robot from odometry.
+    :param new_alpha: New yaw angles from odometry.
+    :param x_variables: Current x positions of the particles.
+    :param y_variables: Current y positions of the particles.
+    :return: Updated x positions, y positions, and yaw angles of the particles.
+    """
+    
+    # Step 1: Add yaw angles to the current yaw angles (alpha)
+    updated_yaw = alpha + yaw
 
-        # Calculate the sum of the two matrices
-        result_matrix = matrix_alpha + matrix_yaw
+    # Step 2: Calculate new x and y positions
+    cos_result = np.cos(updated_yaw)
+    sin_result = np.sin(updated_yaw)
+    delta_x = d * cos_result
+    delta_y = d * sin_result
+    new_x_positions = x_variables + delta_x
+    new_y_positions = y_variables + delta_y
 
-        return result_matrix
+    # Step 3: Update angles with new_alpha
+    updated_alpha = alpha + new_alpha
 
-    def calculate_trig_functions(matrix):
-        # Calculate cosine of the matrix
-        cos_matrix = np.cos(matrix)
+    return new_x_positions, new_y_positions, updated_alpha
 
-        # Calculate sine of the matrix
-        sin_matrix = np.sin(matrix)
+# Example usage
+# n_particles = 100
+# alpha = np.random.uniform(-np.pi, np.pi, n_particles)  # Example current yaw angles
+# yaw = np.random.uniform(-0.1, 0.1, n_particles)  # Example yaw changes from odometry
+# d = np.random.uniform(0, 1, n_particles)  # Example distances from odometry
+# new_alpha = np.random.uniform(-0.1, 0.1, n_particles)  # Example new yaw angles from odometry
+# x_variables = np.random.uniform(0, 10, n_particles)  # Example current x positions
+# y_variables = np.random.uniform(0, 10, n_particles)  # Example current y positions
 
-        return cos_matrix, sin_matrix
+# new_x, new_y, updated_alpha = sample_motion_model(n_particles, alpha, yaw, d, new_alpha, x_variables, y_variables)
 
-    def multiply_with_d(cos_matrix, sin_matrix, d):
-        # Create a 2x𝑛 matrix with left axis as cos_matrix and right axis as sin_matrix
-        matrix = np.vstack((cos_matrix, sin_matrix))
-
-        # Multiply with variable 'd'
-        result_matrix = d * matrix
-
-        return result_matrix
-
-    def sum_with_variables(x_variables, y_variables, final_result):
-        # Create a 2x𝑛 matrix with left axis as x_variables and right axis as y_variables
-        variables_matrix = np.vstack((x_variables, y_variables))
-
-        # Calculate the sum with the final result
-        result_matrix = final_result + variables_matrix
-
-        return result_matrix
-
-    # Step 1: Sum of matrices alpha and yaw
-    result = sum_matrices(n, alpha, yaw)
-
-    # Step 2: Calculate cosine and sine of the result
-    cos_result, sin_result = calculate_trig_functions(result)
-
-    # Step 3: Multiply with variable 'd'
-    final_result = multiply_with_d(cos_result, sin_result, d)
-
-    # Step 4: Sum with x and y variables
-    final_sum = sum_with_variables(x_variables, y_variables, final_result)
-
-    return final_sum
+# print("New x positions:", new_x)
+# print("New y positions:", new_y)
+# print("Updated yaw angles:", updated_alpha)
