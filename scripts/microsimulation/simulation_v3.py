@@ -118,7 +118,8 @@ def getParticleRanges(ps_pos, ps_orientation, pixel_matrix):
     simulated_scans = np.zeros((n_particles, n_scans))  # Placeholder for actual implementation
     
     for i in range(n_particles):
-        x, y, theta = ps_pos[i]  # Ensure correct unpacking
+        x, y = ps_pos[i]
+        theta = ps_orientation[i]
         for j in range(n_scans):
             angle = theta + (j - n_scans // 2) * np.pi / n_scans  # Assuming 180-degree FOV
             scan_range = np.inf
@@ -212,7 +213,7 @@ for t in range(25):
     ps_pos, ps_orientation, ps_weights = resampling(ps_pos, ps_orientation, ps_weights)
     
     # Simulate LiDAR data for visualization
-    simulated_lidar = getParticleRanges(np.array([[X_sequence[t][0], X_sequence[t][1], 0]]), np.array([X_sequence[t][2]]), np.zeros((20, 20)))
+    simulated_lidar = getParticleRanges(np.array([[X_sequence[t][0], X_sequence[t][1]]]), np.array([X_sequence[t][2]]), np.zeros((20, 20)))
     lidar_points = np.array([[X_sequence[t][0] + r * np.cos(theta), X_sequence[t][1] + r * np.sin(theta)] 
                              for r, theta in zip(simulated_lidar[0], np.linspace(-np.pi, np.pi, len(simulated_lidar[0])))])
     
@@ -223,7 +224,5 @@ for t in range(25):
     # Print the state for debugging every 5 steps
     if t % 5 == 0:
         print(f'Step {t}, State: {ps_pos.mean(axis=0)}, Orientation: {ps_orientation.mean()}, Weight: {ps_weights.mean()}')
-
-
 
 plt.show()
